@@ -7,7 +7,7 @@ Este projeto é uma API para gerenciamento de tarefas (To-Do List), desenvolvida
 * **Python**
 * **FastAPI**: Framework web de alta performance.
 * **Poetry**: Gerenciamento de dependências e ambiente virtual.
-* **Pydantic**: Validação de esquemas de dados.
+* **Pydantic**: Validação de esquemas de dados. Utilizado para modelagem e validação rigorosa de dados (Data Validation).
 
 ## 📋 Funcionalidades
 
@@ -15,6 +15,7 @@ Este projeto é uma API para gerenciamento de tarefas (To-Do List), desenvolvida
 * **GET** `/tarefas`: Lista todas as tarefas cadastradas.
 * **PUT** `/tarefas/{nome}`: Marca uma tarefa como concluída.
 * **DELETE** `/tarefas/{nome}`: Remove uma tarefa da lista.
+Validação Automática: A API valida se os campos obrigatórios (nome e descricao) foram enviados corretamente antes de processar a requisição.
 
 ## 🚀 Como Instalar e Rodar
 
@@ -59,7 +60,7 @@ Para testar as rotas conforme os requisitos do desafio, siga os passos abaixo no
 }
 
 ```
-
+"Caso tente enviar um JSON sem o campo nome ou descricao, a API retornará um erro 422, demonstrando a robustez da validação com Pydantic."
 
 
 ### 2. Listar Tarefas (GET)
@@ -86,6 +87,8 @@ Abaixo estão as capturas de tela dos testes realizados conforme os requisitos d
 | Operação | Print do Teste |
 | :--- | :--- |
 | **Adicionar Tarefa** | ![POST Tarefa](screenshots/post_tarefa.JPG) |
+  **Adicionar Tarefa, com erro (sem a descrição)** | ![POST Tarefa](screenshots/post_erro_422.JPG) |
+  **Adicionar Tarefa, com validação** | ![POST Tarefa](screenshots/post_201.JPG) |
 | **Listar Tarefas** | ![GET Tarefas](screenshots/get_tarefas.JPG) |
 | **Concluir Tarefa** | ![PUT Concluir](screenshots/put_concluir.JPG) |
 | **Remover Tarefa** | ![DELETE Remover](screenshots/delete_tarefa.JPG) |

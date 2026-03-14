@@ -95,14 +95,12 @@ Para qualquer requisição, configure a aba **Authorization** no Postman:
 
 ## 🧪 Evidências de Testes (Postman)
 
-## 🧪 Evidências de Testes (Postman)
-
 | Funcionalidade | Descrição | Print do Teste |
 | :--- | :--- | :--- |
-| **Autenticação** | Erro 401 sem credenciais | ![401](screenshots/auth_error.png) |
-| **Página 1** | Listagem com `size=2` | ![Paginação](screenshots/paginacao.png) |
-| **Ordenação** | Ordenado por `nome` | ![Ordenação](screenshots/ordenacao.png) |
-| **Criação** | POST com sucesso (201) | ![POST](screenshots/post_sucesso.png) |
+| **Autenticação** | Erro 401 sem credenciais | ![401](screenshots/auth_error.JPG) |
+| **Página 1** | Listagem com `size=2` | ![Paginação](screenshots/paginacao.JPG) |
+| **Ordenação** | Ordenado por `nome` | ![Ordenação](screenshots/ordenacao.JPG) |
+| **Criação** | POST com sucesso (201) | ![POST](screenshots/post_sucesso.JPG) |
 ---
 
 ## 📖 Documentação Automática (Swagger)

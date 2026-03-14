@@ -1,30 +1,37 @@
-# 🚀 Gerenciador de Tarefas com FastAPI
+# 🚀 Gerenciador de Tarefas Pro (V3) - FastAPI
 
-Este projeto é uma API para gerenciamento de tarefas (To-Do List), desenvolvida para o curso Backend em Python da **EBAC**. A aplicação foi construída com **FastAPI** e validada utilizando o **Postman**.
+Este projeto é uma API robusta para gerenciamento de tarefas (To-Do List), desenvolvida para o curso **Backend em Python da EBAC**. Nesta versão, a aplicação conta com segurança por autenticação, controle de fluxo de dados por paginação e filtros de ordenação.
+
+---
 
 ## 🛠️ Tecnologias Utilizadas
 
 * **Python**
-* **FastAPI**: Framework web de alta performance.
-* **Poetry**: Gerenciamento de dependências e ambiente virtual.
-* **Pydantic**: Validação de esquemas de dados. Utilizado para modelagem e validação rigorosa de dados (Data Validation).
+* **FastAPI**: Framework web de alta performance e documentação automática.
+* **Poetry**: Gerenciamento moderno de dependências e ambientes virtuais.
+* **Pydantic**: Validação rigorosa de tipos e esquemas de dados.
+* **HTTP Basic Auth**: Implementação de segurança para acesso aos endpoints.
 
-## 📋 Funcionalidades
+---
 
-* **POST** `/tarefas`: Adiciona uma nova tarefa (Nome e Descrição).
-* **GET** `/tarefas`: Lista todas as tarefas cadastradas.
-* **PUT** `/tarefas/{nome}`: Marca uma tarefa como concluída.
-* **DELETE** `/tarefas/{nome}`: Remove uma tarefa da lista.
-Validação Automática: A API valida se os campos obrigatórios (nome e descricao) foram enviados corretamente antes de processar a requisição.
+## 📋 Funcionalidades Avançadas
+
+* **Segurança**: Todos os endpoints são protegidos. Requer usuário e senha para acesso.
+* **Paginação**: O endpoint de listagem permite controlar a quantidade de dados retornados (`page` e `size`).
+* **Ordenação**: Suporte para ordenar as tarefas alfabeticamente por `nome` ou `descricao`.
+* **Validação Automática**: Tratamento de erros **422** (dados inválidos), **401** (não autorizado) e **400** (parâmetros de busca incorretos).
+
+---
 
 ## 🚀 Como Instalar e Rodar
 
 1. **Clone o repositório:**
-   ```bash
-   git clone https://github.com/Li-code1/meu-gerenciador-tarefas-python.git
-   cd seu-repositorio
+```bash
+git clone https://github.com/Li-code1/meu-gerenciador-tarefas-python.git
+cd meu-gerenciador-tarefas-python
 
 ```
+
 
 2. **Instale as dependências com o Poetry:**
 ```bash
@@ -41,60 +48,71 @@ poetry run uvicorn app:app --reload
 
 
 
-O servidor estará rodando em: `http://127.0.0.1:8000`
+---
 
 ## 🧪 Testando com Postman
 
-Para testar as rotas conforme os requisitos do desafio, siga os passos abaixo no **Postman**:
+### 🔑 Credenciais de Acesso
+
+Para qualquer requisição, configure a aba **Authorization** no Postman:
+
+* **Type:** Basic Auth
+* **Username:** `admin`
+* **Password:** `ebac123`
+
+"⚠️ Nota de Segurança: As credenciais utilizadas neste projeto (admin/ebac123) são apenas para fins de teste e demonstração do desafio. Em um ambiente de produção, seriam utilizadas variáveis de ambiente (.env) e senhas criptografadas em banco de dados."
 
 ### 1. Criar uma Tarefa (POST)
 
 * **URL:** `http://127.0.0.1:8000/tarefas`
-* **Body:** Selecione `raw` e o formato `JSON`.
-* **Exemplo de JSON:**
+* **Body (JSON):**
 ```json
 {
-  "nome": "Estudar Python",
-  "descricao": "Praticar FastAPI e Poetry",
+  "nome": "Estudar Autenticação",
+  "descricao": "Praticar Basic Auth no FastAPI",
   "concluida": false
 }
 
 ```
-"Caso tente enviar um JSON sem o campo nome ou descricao, a API retornará um erro 422, demonstrando a robustez da validação com Pydantic."
 
 
-### 2. Listar Tarefas (GET)
 
-* **URL:** `http://127.0.0.1:8000/tarefas`
-* **Método:** GET (não precisa de corpo).
+### 2. Listar com Paginação e Ordenação (GET)
 
-### 3. Concluir Tarefa (PUT)
-
-* **URL:** `http://127.0.0.1:8000/tarefas/Estudar%20Python`
-* **Método:** PUT.
-* *Nota: O nome da tarefa vai direto na URL.*
-
-### 4. Remover Tarefa (DELETE)
-
-* **URL:** `http://127.0.0.1:8000/tarefas/Estudar%20Python`
-* **Método:** DELETE.
+* **URL Exemplo:** `http://127.0.0.1:8000/tarefas?page=1&size=2&ordenar_por=nome`
+* **Parâmetros:**
+* `page`: Número da página (ex: 1).
+* `size`: Itens por página (ex: 5).
+* `ordenar_por`: Campo para ordem (`nome` ou `descricao`).
 
 
-## 🧪 Testes Realizados (Postman)
 
-Abaixo estão as capturas de tela dos testes realizados conforme os requisitos do desafio:
+### 3. Concluir e Remover (PUT/DELETE)
 
-| Operação | Print do Teste |
-| :--- | :--- |
-| **Adicionar Tarefa** | ![POST Tarefa](screenshots/post_tarefa.JPG) |
-  **Adicionar Tarefa, com erro (sem a descrição)** | ![POST Tarefa](screenshots/post_erro_422.JPG) |
-  **Adicionar Tarefa, com validação** | ![POST Tarefa](screenshots/post_201.JPG) |
-| **Listar Tarefas** | ![GET Tarefas](screenshots/get_tarefas.JPG) |
-| **Concluir Tarefa** | ![PUT Concluir](screenshots/put_concluir.JPG) |
-| **Remover Tarefa** | ![DELETE Remover](screenshots/delete_tarefa.JPG) |
+* **URLs:** `http://127.0.0.1:8000/tarefas/{nome_da_tarefa}`
+
+---
+
+## 🧪 Evidências de Testes (Postman)
+
+## 🧪 Evidências de Testes (Postman)
+
+| Funcionalidade | Descrição | Print do Teste |
+| :--- | :--- | :--- |
+| **Autenticação** | Erro 401 sem credenciais | ![401](screenshots/auth_error.png) |
+| **Página 1** | Listagem com `size=2` | ![Paginação](screenshots/paginacao.png) |
+| **Ordenação** | Ordenado por `nome` | ![Ordenação](screenshots/ordenacao.png) |
+| **Criação** | POST com sucesso (201) | ![POST](screenshots/post_sucesso.png) |
+---
+
+## 📖 Documentação Automática (Swagger)
+
+Com o servidor rodando, acesse a documentação interativa para testar os filtros e a segurança:
+
+* **Swagger UI:** [http://127.0.0.1:8000/docs](https://www.google.com/search?q=http://127.0.0.1:8000/docs)
+
 ---
 
 Desenvolvido por **Liliane Lima** ✨
 
-```
 

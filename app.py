@@ -1,68 +1,104 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional, Annotated 
+import secrets
 
-# Inicialização da aplicação com metadados para o Swagger
 app = FastAPI(
-    title="Gerenciador de Tarefas V2",
-    description="API para gerenciamento de tarefas com validação Pydantic e documentação de erros.",
-    version="2.0.0"
+    title="Gerenciador de Tarefas Pro - V3",
+    description="API com Autenticação, Paginação e Ordenação (SonarLint Optimized).",
+    version="3.0.1"
 )
 
-# Passo 1: Modelo Pydantic para validação de dados
+security = HTTPBasic()
+
+# --- Função de Autenticação ---
+def autenticar(credentials: HTTPBasicCredentials = Depends(security)):
+    usuario_correto = secrets.compare_digest(credentials.username, "admin")
+    senha_correta = secrets.compare_digest(credentials.password, "ebac123")
+    
+    if not (usuario_correto and senha_correta):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Credenciais inválidas.",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return credentials.username
+
+UserDep = Annotated[str, Depends(autenticar)]
+
 class Tarefa(BaseModel):
     nome: str
     descricao: str
-    concluida: bool = False  # Padrão False caso não seja enviado
+    concluida: bool = False
 
-# Banco de dados em memória
 tarefas_db: List[Tarefa] = []
 
-# --- ROTAS DA API ---
+# --- ROTAS ---
 
-@app.get("/tarefas", response_model=List[Tarefa], summary="Listar todas as tarefas")
-def listar_tarefas():
-    """Retorna a lista completa de tarefas cadastradas."""
-    return tarefas_db
+@app.get(
+    "/tarefas", 
+    response_model=List[Tarefa],
+    responses={400: {"description": "Parâmetros inválidos"}}
+)
+def listar_tarefas(
+    usuario: UserDep,
+    page: int = 1,
+    size: int = 5,
+    ordenar_por: Optional[str] = None
+):
+    if page < 1 or size < 1:
+        raise HTTPException(status_code=400, detail="Página e tamanho devem ser > 0.")
+
+    resultado = tarefas_db.copy()
+
+    if ordenar_por:
+        if ordenar_por not in ["nome", "descricao"]:
+            raise HTTPException(status_code=400, detail="Campo inválido.")
+        resultado.sort(key=lambda x: getattr(x, ordenar_por).lower())
+
+    inicio = (page - 1) * size
+    return resultado[inicio:inicio + size]
 
 @app.post(
     "/tarefas", 
-    status_code=201, 
-    summary="Adicionar uma nova tarefa",
-    responses={400: {"description": "Erro de validação: Tarefa já existente"}}
+    status_code=201,
+    responses={
+        400: {"description": "Tarefa já existe"}, 
+        401: {"description": "Não autorizado"}
+    }
 )
-def adicionar_tarefa(tarefa: Tarefa):
-    """Cria uma nova tarefa e a adiciona ao banco de dados."""
+def adicionar_tarefa(tarefa: Tarefa, usuario: UserDep):
     if any(t.nome.lower() == tarefa.nome.lower() for t in tarefas_db):
         raise HTTPException(status_code=400, detail="Essa tarefa já existe.")
     
     tarefas_db.append(tarefa)
-    return {"mensagem": "Tarefa adicionada com sucesso!", "tarefa": tarefa}
+    return {"mensagem": f"Tarefa adicionada por {usuario}!"}
 
 @app.put(
-    "/tarefas/{nome_tarefa}", 
-    summary="Marcar tarefa como concluída",
-    responses={404: {"description": "Tarefa não encontrada"}}
+    "/tarefas/{nome_tarefa}",
+    responses={
+        404: {"description": "Não encontrada"},
+        401: {"description": "Não autorizado"}
+    }
 )
-def concluir_tarefa(nome_tarefa: str):
-    """Localiza uma tarefa pelo nome e altera o status 'concluida' para True."""
+def concluir_tarefa(nome_tarefa: str, usuario: UserDep): 
     for tarefa in tarefas_db:
         if tarefa.nome.lower() == nome_tarefa.lower():
             tarefa.concluida = True
-            return {"mensagem": f"Tarefa '{nome_tarefa}' marcada como concluída."}
-    
+            return {"mensagem": "Tarefa atualizada."}
     raise HTTPException(status_code=404, detail="Tarefa não encontrada.")
 
 @app.delete(
-    "/tarefas/{nome_tarefa}", 
-    summary="Remover uma tarefa",
-    responses={404: {"description": "Tarefa não encontrada"}}
+    "/tarefas/{nome_tarefa}",
+    responses={
+        404: {"description": "Não encontrada"},
+        401: {"description": "Não autorizado"}
+    }
 )
-def remover_tarefa(nome_tarefa: str):
-    """Remove uma tarefa da lista com base no nome fornecido."""
+def remover_tarefa(nome_tarefa: str, usuario: UserDep): 
     for index, tarefa in enumerate(tarefas_db):
         if tarefa.nome.lower() == nome_tarefa.lower():
             tarefas_db.pop(index)
-            return {"mensagem": f"Tarefa '{nome_tarefa}' removida com sucesso."}
-    
+            return {"mensagem": "Tarefa removida."}
     raise HTTPException(status_code=404, detail="Tarefa não encontrada.")

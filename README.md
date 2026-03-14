@@ -95,8 +95,6 @@ Para qualquer requisição, configure a aba **Authorization** no Postman:
 
 ## 🧪 Evidências de Testes (Postman)
 
-## 🧪 Evidências de Testes (Postman)
-
 | Funcionalidade | Descrição | Print do Teste |
 | :--- | :--- | :--- |
 | **Autenticação** | Erro 401 sem credenciais | ![401](screenshots/auth_error.png) |
